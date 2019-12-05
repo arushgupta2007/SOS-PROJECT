@@ -4,6 +4,10 @@ import time
 import cv2
 import threading
 import socket
+import os
+
+#os.system("fuser -k 21567/tcp")
+#os.system("fuser -k 21567/tcp")
 
 label_map = ["Person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", 
             "boat", "traffic light", "fire hydrant", "", "stop sign", "parking meter", "bench",
@@ -145,21 +149,20 @@ class Main:
 										cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv2.LINE_AA)
 					center = (int((x[0] + x[1]) / 2), int((y[0] + y[1]) / 2))
 					image = cv2.circle(image, center, 1, (255, 0, 0), 10)
-					print(filteredImg[center[1]:center[1] + 1, center[0]:center[0] + 1][0][0])
-					if filteredImg[center[1]:center[1] + 1, center[0]:center[0] + 1][0][0] >= 10 :
+					print(filter_img[center[1]:center[1] + 1, center[0]:center[0] + 1][0][0])
+					if filter_img[center[1]:center[1] + 1, center[0]:center[0] + 1][0][0] >= 10 :
 						list_of_near_obj.append(label_map[int(class_id)])
 						
 			with lock:
 				tag = ""
-				if self.counter == 3:
-					for i in list_of_close:
-						tag += i + ", "
-					list_of_near_obj = []
-					if tag != "":
-						tag += " are near!"
-					self.counter = 0
-				else:
-					self.counter += 1
+				for i in list_of_near_obj:
+					tag += i + ", "
+				list_of_near_obj = []
+				if tag != "":
+					tag += " are near!"
+
+
+
 						
 			end_time = cv2.getTickCount()
 			time_take = (end_time - starttime)/freq
@@ -168,7 +171,7 @@ class Main:
 			image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)	
 
 			cv2.imshow("Frame", image)
-			cv2.imshow("leftFrame", filteredImg)    
+			cv2.imshow("leftFrame", filter_img)    
 			key = cv2.waitKey(1) & 0xFF
 
 			if key == ord("q"):
